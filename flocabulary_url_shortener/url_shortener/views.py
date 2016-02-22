@@ -1,12 +1,12 @@
 from django.http import HttpResponse, HttpResponseNotAllowed
-from django.shortcuts import redirect, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404
 import json
 
 from .models import Url
 
 
 def index(request):
-    return HttpResponse("Hello, world. You're at the polls index.")
+    return render(request, 'url_shortener/index.html')
 
 
 def shorten(request):
