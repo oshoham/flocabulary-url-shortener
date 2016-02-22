@@ -1,11 +1,25 @@
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, HttpResponseNotAllowed
 from django.shortcuts import redirect, get_object_or_404
+import json
 
 from .models import Url
 
 
 def index(request):
     return HttpResponse("Hello, world. You're at the polls index.")
+
+
+def shorten(request):
+    if request.method != 'POST':
+        return HttpResponseNotAllowed(['POST'])
+
+    body = json.loads(request.body)
+    url, _ = Url.objects.get_or_create(url=body['long_url'])
+    data = {
+        'short_url': url.short_id,
+        'long_url': url.url
+    }
+    return HttpResponse(json.dumps(data), content_type='application/json')
 
 
 def redirect_short_url(request, short_url):
