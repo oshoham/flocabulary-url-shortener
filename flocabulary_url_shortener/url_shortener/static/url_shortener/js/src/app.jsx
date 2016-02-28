@@ -32,7 +32,7 @@ export default React.createClass({
   handleFormSubmit (event) {
     event.preventDefault();
 
-    if (!this.state.displayShortUrl && this.state.longUrl) {
+    if (!this.state.copyOnSubmit && this.state.longUrl) {
       this.fetchShortUrl(this.state.longUrl).then(({ short_url, long_url }) => {
         this.setState({
           shortUrl: short_url,
