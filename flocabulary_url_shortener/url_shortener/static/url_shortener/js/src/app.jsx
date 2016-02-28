@@ -1,36 +1,51 @@
 import React from 'react';
-
-var ShortenUrlForm = React.createClass({
-  propTypes: {
-    onSubmit: React.PropTypes.func.isRequired
-  },
-
-  getInitialState () {
-    return { longUrl: '' };
-  },
-
-  handleSubmit (event) {
-    event.preventDefault();
-    this.props.onSubmit(this.state.longUrl);
-  },
-
-  handleChange (event) {
-    this.setState({ longUrl: event.target.value });
-  },
-
-  render () {
-    return (
-      <form className="shorten-url__form" onSubmit={this.handleSubmit}>
-        <input className="shorten-url__input" type="text" value={this.state.longUrl} placeholder="Enter a link to shorten it" onChange={this.handleChange}/>
-      </form>
-    );
-  }
-});
+import Clipboard from 'clipboard';
 
 export default React.createClass({
-  displayName: 'App',
+  getInitialState () {
+    return {
+      longUrl: '',
+      shortUrl: '',
+      hasShortUrl: false,
+      displayShortUrl: false,
+      copyOnSubmit: false
+    };
+  },
 
-  requestShortUrl (longUrl) {
+  componentDidUpdate () {
+    if (this.state.copyOnSubmit) {
+      this.clipboard = new Clipboard('.shorten-url__submit', { text: () => this.state.shortUrl });
+    } else if (this.clipboard) {
+      this.clipboard.destroy();
+    }
+  },
+
+  handleInputChange (event) {
+    var value = event.target.value;
+    this.setState({
+      longUrl: value,
+      displayShortUrl: false,
+      copyOnSubmit: this.state.hasShortUrl && value === this.state.shortUrl
+    });
+  },
+
+  handleFormSubmit (event) {
+    event.preventDefault();
+
+    if (!this.state.displayShortUrl && this.state.longUrl) {
+      this.fetchShortUrl(this.state.longUrl).then(({ short_url, long_url }) => {
+        this.setState({
+          shortUrl: short_url,
+          longUrl: long_url,
+          hasShortUrl: true,
+          displayShortUrl: true,
+          copyOnSubmit: true
+        });
+      });
+    }
+  },
+
+  fetchShortUrl (longUrl) {
     var fetchParams = {
       method: 'post',
       headers: {
@@ -42,7 +57,7 @@ export default React.createClass({
       body: JSON.stringify({ long_url: longUrl })
     };
 
-    fetch('/shorten', fetchParams)
+    return fetch('/shorten', fetchParams)
       .then(function (response) {
         if (response.status >= 200 && response.status < 300) {
           return response;
@@ -52,16 +67,32 @@ export default React.createClass({
           throw error;
         }
       })
-      .then(response => response.json())
-      .then(function ({ short_url: shortUrl, long_url: longUrl }) {
-        debugger;
-      });
+      .then(response => response.json());
+  },
+
+  clearInput (event) {
+    event.preventDefault();
+    this.setState({
+      longUrl: '',
+      displayShortUrl: false,
+      copyOnSubmit: false
+    });
   },
 
   render () {
+    var inputValue = this.state.displayShortUrl ? this.state.shortUrl : this.state.longUrl;
+    var buttonValue = this.state.copyOnSubmit ? 'Copy' : 'Shorten';
+    var clearInputLink = this.state.displayShortUrl ? <a href="#" className="shorten-url__clear" onClick={this.clearInput}>X</a> : null;
+
     return (
       <div className="shorten-url">
-        <ShortenUrlForm onSubmit={this.requestShortUrl}/>
+        <form className="shorten-url__form" onSubmit={this.handleFormSubmit}>
+          <fieldset className="shorten-url__fieldset">
+            <input className="shorten-url__input" type="text" value={inputValue} placeholder="Enter a link to shorten it" onChange={this.handleInputChange}/>
+            {clearInputLink}
+            <button className="shorten-url__submit" type="submit">{buttonValue}</button>
+          </fieldset>
+        </form>
       </div>
     );
   }
