@@ -2,6 +2,7 @@ from django.http import HttpResponse, HttpResponseNotAllowed, HttpResponseBadReq
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.csrf import ensure_csrf_cookie
 import json
+import urlparse
 
 from .models import Url
 
@@ -22,7 +23,7 @@ def shorten(request):
 
     url, _ = Url.objects.get_or_create(url=long_url)
     data = {
-        'short_url': url.short_id,
+        'short_url': '/'.join([request.META['HTTP_HOST'], url.short_id]),
         'long_url': url.url
     }
     return HttpResponse(json.dumps(data), content_type='application/json')
@@ -31,4 +32,10 @@ def shorten(request):
 def redirect_short_url(request, short_url):
     pk = Url.decode_short_id(short_url)
     url = get_object_or_404(Url, pk=pk)
-    return redirect(url.url)
+    redirect_url = url.url
+
+    # ensure that redirect_url is always an absolute url
+    if not urlparse.urlparse(redirect_url).netloc:
+        redirect_url = 'http://' + redirect_url
+
+    return redirect(redirect_url)
