@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "A React front-end for a simple URL shortening service.",
   "main": "index.js",
-  "devDependencies": {
+  "dependencies": {
     "babel": "^6.5.2",
     "babel-core": "^6.5.2",
     "babel-loader": "^6.2.3",
