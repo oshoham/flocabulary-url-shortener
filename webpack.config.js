@@ -1,13 +1,14 @@
 var webpack = require('webpack');
-var path = require('path');
+
+var baseDir = __dirname + '/url_shortener/static/url_shortener/js';
 
 module.exports = {
-  context: __dirname,
+  context: baseDir,
 
-  entry: './src/index', // entry point of our app. assets/js/index.js should require other js modules and dependencies it needs
+  entry: './src/index',
 
   output: {
-    path: path.resolve('./dist/'),
+    path: baseDir + '/dist',
     filename: 'bundle.js'
   },
 
@@ -31,7 +32,7 @@ module.exports = {
   },
 
   resolve: {
-    modulesDirectories: ['node_modules', 'bower_components'],
+    modulesDirectories: ['node_modules'],
     extensions: ['', '.js', '.jsx']
   }
 };

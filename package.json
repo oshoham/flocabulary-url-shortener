@@ -19,7 +19,8 @@
     "whatwg-fetch": "^0.11.0"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "postinstall": "node_modules/webpack/bin/webpack.js",
+    "webpack": "node_modules/webpack/bin/webpack.js --watch"
   },
   "author": "Oren Shoham <oren.avraham.shoham@gmail.com>",
   "license": "ISC"
