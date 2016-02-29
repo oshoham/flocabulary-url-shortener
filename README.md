@@ -25,3 +25,11 @@ $ heroku local:run python manage.py migrate
 $ python manage.py collectstatic
 $ heroku local
 ```
+
+## Tests
+
+To run the test suite, run
+
+```
+$ python manage.py test
+```
