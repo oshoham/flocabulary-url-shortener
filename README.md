@@ -26,6 +26,8 @@ $ python manage.py collectstatic
 $ heroku local
 ```
 
+Your app should now be running on [localhost:5000](http://localhost:5000/).
+
 ## Tests
 
 To run the test suite, run
